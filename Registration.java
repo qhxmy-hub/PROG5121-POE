@@ -1,195 +1,118 @@
+package com.mycompany.registration;
+import java.util.*;
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
 
-package com.mycompany.registration;
-
-import java.util.Scanner;
-import java.util.ArrayList;
-
-/**
- *
- * @author qhxme
- */
 
 public class Registration {
 
-    String userName;
-    String password;
-    String cellPhoneNumber;
+    public void main(String[] args) {
 
-    public Registration() {
-        // clean constructor (no crashes)
-    }
+        Scanner obj = new Scanner(System.in);
 
-    // ================= VALIDATION =================
-
-    public boolean checkUserName(String username) {
-        return username.contains("_") && username.length() <= 5;
-    }
-
-    public boolean checkPassword(String password) {
-        if (password.length() < 8) return false;
-
-        boolean hasUpper = false;
-        boolean hasNumber = false;
-        boolean hasSpecial = false;
-
-        for (int i = 0; i < password.length(); i++) {
-            char ch = password.charAt(i);
-
-            if (Character.isUpperCase(ch)) {
-                hasUpper = true;
-            } else if (Character.isDigit(ch)) {
-                hasNumber = true;
-            } else if (!Character.isLetterOrDigit(ch)) {
-                hasSpecial = true;
-            }
-        }
-
-        return hasUpper && hasNumber && hasSpecial;
-    }
-
-    public boolean checkCellPhoneNumber(String phone) {
-        if (!phone.startsWith("+27")) return false;
-        if (phone.length() != 12) return false;
-
-        for (int i = 3; i < phone.length(); i++) {
-            if (!Character.isDigit(phone.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // ================= REGISTER =================
-
-    public boolean register(Scanner sc) {
-
-        System.out.println("\n=== REGISTER ===");
-
-        // Username
-        System.out.print("Enter username: ");
-        String username = sc.nextLine();
-
-        if (!checkUserName(username)) {
-            System.out.println("Invalid username!");
-            System.out.println("Must contain '_' and be max 5 characters.");
-            return false;
-        }
-
-        // Password
-        System.out.print("Enter password: ");
-        String password = sc.nextLine();
-
-        if (!checkPassword(password)) {
-            System.out.println("Invalid password!");
-            System.out.println("Must be 8+ chars, include uppercase, number, special char.");
-            return false;
-        }
-
-        // Phone
-        System.out.print("Enter cell number (+27...): ");
-        String phone = sc.nextLine();
-
-        if (!checkCellPhoneNumber(phone)) {
-            System.out.println("Invalid phone number!");
-            return false;
-        }
-
-        // Save data
-        this.userName = username;
-        this.password = password;
-        this.cellPhoneNumber = phone;
-
-        System.out.println("Registration successful!\n");
-        return true;
-    }
-
-    // ================= LOGIN =================
-
-    public boolean login(Scanner sc) {
-
-        System.out.println("\n=== LOGIN ===");
-
-        System.out.print("Enter username: ");
-        String u = sc.nextLine();
-
-        System.out.print("Enter password: ");
-        String p = sc.nextLine();
-
-        return this.userName != null &&
-               this.userName.equals(u) &&
-               this.password.equals(p);
-    }
-}
-
-
-public class Main {
-
-    public static void main(String[] args) {
-
-        Scanner sc = new Scanner(System.in);
-        ArrayList<Registration> users = new ArrayList<>();
+        Login user = new Login(); // CHANGED: using Login class
 
         int choice;
 
         do {
-            System.out.println("\n=== MENU ===");
+            System.out.println("\n MENU ");
             System.out.println("1. Register");
             System.out.println("2. Login");
             System.out.println("3. Exit");
             System.out.print("Choose option: ");
 
-            choice = sc.nextInt();
-            sc.nextLine(); // clear buffer
+            choice = obj.nextInt();
+            obj.nextLine();
 
             switch (choice) {
 
-                case 1:
-                    Registration newUser = new Registration();
+                case 1 -> register(user, obj);
 
-                    if (newUser.register(sc)) {
-                        users.add(newUser);
-                    }
-                    break;
+                case 2 -> login(user, obj); // CHANGED: moved login method
 
-                case 2:
-                    System.out.println("\n=== LOGIN  ===");
+                case 3 -> System.out.println("Goodbye!");
 
-                    System.out.print("Enter username: ");
-                    String username = sc.nextLine();
-
-                    System.out.print("Enter password: ");
-                    String password = sc.nextLine();
-
-                    boolean found = false;
-
-                    for (Registration user : users) {
-                        if (user.userName.equals(username)
-                                && user.password.equals(password)) {
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (found) {
-                        System.out.println("Login successful! Welcome back.");
-                    } else {
-                        System.out.println("Login failed: incorrect details.");
-                    }
-                    break;
-
-                case 3:
-                    System.out.println("Goodbye!");
-                    break;
-
-                default:
-                    System.out.println("Invalid option.");
+                default -> System.out.println("Invalid Option.");
             }
 
         } while (choice != 3);
 
-        sc.close();
+        obj.close();
+    }
+
+    // REGISTRATION PROCESS
+    public  void register(Login user, Scanner obj) { 
+
+        System.out.println("\n REGISTER ");
+
+        // USERNAME INPUT
+        while (true) {
+            System.out.print("Enter username: ");
+            String usernameInput = obj.nextLine();
+
+            if(user.checkUserName(usernameInput)) {
+                System.out.println("Username successfully captured!");
+                user.userName = usernameInput;
+                break;
+            }else{
+                System.out.println("Username must contain a '_' ");
+                System.out.println("Username characters should not be more than 5 characters in length.");
+            }
+        }
+
+        // PASSWORD INPUT
+        while (true) {
+            System.out.print("Enter password: ");
+            String passwordInput = obj.nextLine();
+
+            if(user.checkPasswordComplexity(passwordInput)) {
+                System.out.println("Password successfully captured!");
+                user.Password = passwordInput;
+                break;
+            }else{
+                System.out.println("Password is not correctly formatted.");
+                System.out.println("Password to contain at least 8 characters.");
+                System.out.println("Password must contain a Uppercase."); 
+                System.out.println("Password should contain a number.");
+                System.out.println("Password must contain a special character.");
+            }
+        }
+
+        // CELL PHONE NUMBER INPUT
+        while(true) {
+            System.out.print("Enter phone (+27...): ");
+            String phoneInput = obj.nextLine();
+
+            if(user.checkCellPhoneNumber(phoneInput)) { 
+                System.out.println("Cell Phone Number successfully added!");
+                user.cellPhoneNumber = phoneInput;
+                break;
+            }else{
+                System.out.println("Cell Phone Number incorrectly formatted.");
+                System.out.println("Cell Phone Number does not include international code.");
+            }
+        }
+
+        System.out.println("Registration Successful!\n");
+    }
+
+    // LOGIN PROCESS
+    public static void login(Login user, Scanner obj) { 
+
+        System.out.println("\n LOGIN ");
+
+        System.out.print("Enter username: ");
+        String username = obj.nextLine();
+
+        System.out.print("Enter password: ");
+        String password = obj.nextLine();
+
+        boolean status = user.loginUser(username, password);
+        System.out.println(user.returnLoginStatus(status));
     }
 }
+   
+
+    
+   
